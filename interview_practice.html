@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>면접 질문 연습기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&family=Pretendard:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --card: #ffffff;
+    --text: #1a1a18;
+    --muted: #7a7870;
+    --border: #e2dfd8;
+    --accent: #2d4a3e;
+    --accent-light: #e8efe9;
+    --tag-bg: #f0ede8;
+    --serif: 'Noto Serif KR', serif;
+    --sans: 'Pretendard', -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+  .container { max-width: 680px; margin: 0 auto; }
+
+  header { margin-bottom: 40px; }
+  header h1 {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  header p { font-size: 14px; color: var(--muted); }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+  }
+  .tab {
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.15s;
+  }
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 500;
+  }
+  .section { display: none; }
+  .section.show { display: block; }
+
+  /* 연습 탭 */
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .pill {
+    padding: 5px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: none;
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .pill.on {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 40px;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 16px;
+    position: relative;
+    transition: all 0.2s;
+  }
+  .q-num {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .q-text {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.7;
+    color: var(--text);
+    max-width: 480px;
+  }
+  .q-cat {
+    margin-top: 24px;
+    font-size: 11px;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  .empty-msg {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  .btn {
+    padding: 10px 24px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn:hover { background: var(--tag-bg); }
+  .btn:active { transform: scale(0.98); }
+  .btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 500;
+  }
+  .btn.primary:hover { background: #1e3329; }
+
+  .progress {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    min-height: 18px;
+  }
+
+  /* 관리 탭 */
+  .manage-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .manage-head {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .manage-head span { font-size: 14px; font-weight: 500; }
+  .manage-head small { font-size: 12px; color: var(--muted); }
+  .q-list { padding: 0 20px; max-height: 400px; overflow-y: auto; }
+  .q-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .q-item:last-child { border-bottom: none; }
+  .q-cat-tag {
+    font-size: 10px;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+  .q-item-text { font-size: 13px; line-height: 1.5; flex: 1; color: var(--text); }
+  .del-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: var(--border);
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.1s;
+  }
+  .del-btn:hover { color: #c0392b; }
+
+  .add-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .add-row select {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+  .add-row input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+  }
+  .add-row input:focus { border-color: var(--accent); }
+  .add-row input::placeholder { color: var(--muted); }
+
+  footer {
+    margin-top: 48px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--border);
+  }
+
+  @media (max-width: 480px) {
+    .q-card { padding: 36px 24px; }
+    .q-text { font-size: 17px; }
+    .add-row { flex-wrap: wrap; }
+    .add-row select { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>면접 질문 연습기</h1>
+    <p>버튼을 눌러 랜덤 질문을 뽑고, 소리 내어 답변해보세요.</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('practice')">연습하기</button>
+    <button class="tab" onclick="switchTab('manage')">질문 관리</button>
+  </div>
+
+  <div id="sec-practice" class="section show">
+    <div class="filter-row" id="filter-row"></div>
+    <div class="q-card" id="q-card">
+      <p class="empty-msg">아래 버튼을 눌러 첫 질문을 뽑아보세요.</p>
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" onclick="nextQ()">다음 질문 뽑기</button>
+      <button class="btn" onclick="shuffleAll()">전체 섞기</button>
+    </div>
+    <p class="progress" id="progress"></p>
+  </div>
+
+  <div id="sec-manage" class="section">
+    <div class="manage-box">
+      <div class="manage-head">
+        <span>질문 목록</span>
+        <small id="q-count">0개</small>
+      </div>
+      <div class="q-list" id="q-list"></div>
+    </div>
+    <div class="add-row">
+      <select id="cat-sel">
+        <option value="직무이해">직무이해</option>
+        <option value="가치관">가치관</option>
+        <option value="경험">경험</option>
+        <option value="산업지식">산업지식</option>
+        <option value="상황대응">상황대응</option>
+        <option value="기타">기타</option>
+      </select>
+      <input type="text" id="new-q" placeholder="새 질문을 입력하고 Enter" onkeydown="if(event.key==='Enter')addQ()"/>
+      <button class="btn primary" onclick="addQ()">추가</button>
+    </div>
+  </div>
+
+  <footer>질문은 브라우저에 저장됩니다</footer>
+</div>
+
+<script>
+const DEFAULTS = [
+  {t:"HR을 수행하는 데 필요한 역량 3가지는?", c:"직무이해"},
+  {t:"본인의 단점 2가지를 말해보세요.", c:"가치관"},
+  {t:"스트레스 해소 방법은 무엇인가요?", c:"가치관"},
+  {t:"우리 회사 CSR에 대해 아는 것이 있나요?", c:"산업지식"},
+  {t:"대학 시절 가장 적극적으로 수행했던 일은?", c:"경험"},
+  {t:"타지 생활에 적응 가능한지 말해주세요.", c:"상황대응"},
+  {t:"석유사업의 전망에 대한 개인적인 의견은?", c:"산업지식"},
+  {t:"다른 직무에 배치된다면 어떻게 할 것인가?", c:"상황대응"},
+  {t:"경영지원 직무가 어떤 일을 하는지 설명해주세요.", c:"직무이해"},
+  {t:"30초 자기소개를 해보세요.", c:"경험"},
+  {t:"구체적으로 어떤 직무를 희망하시나요?", c:"직무이해"},
+  {t:"인턴 생활 중 가장 어려웠던 점은?", c:"경험"},
+  {t:"자소서에 쓴 전공 관련 개념을 설명해주세요.", c:"직무이해"},
+  {t:"인사의 기능 중 관심 있는 분야를 설명해주세요.", c:"직무이해"},
+  {t:"1년간 인사업무 사이클에 대해 말해보세요.", c:"직무이해"},
+  {t:"인사업무에서 가장 중요하다고 생각하는 것은?", c:"직무이해"},
+  {t:"본인의 HR 경험과 희망 업무를 말해주세요.", c:"경험"},
+  {t:"MBO, KPI, BSC, OKR의 차이를 설명해주세요.", c:"직무이해"},
+];
+
+let questions = JSON.parse(localStorage.getItem('interview_qs') || 'null') || DEFAULTS.map((q,i)=>({...q,id:i}));
+let nextId = Math.max(...questions.map(q=>q.id), 0) + 1;
+let shown = [];
+let activeFilters = [];
+let currentQ = null;
+
+function save() { localStorage.setItem('interview_qs', JSON.stringify(questions)); }
+
+function allCats() { return [...new Set(questions.map(q=>q.c))]; }
+
+function renderFilters() {
+  const row = document.getElementById('filter-row');
+  row.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'pill' + (activeFilters.length===0?' on':'');
+  allBtn.textContent = '전체';
+  allBtn.onclick = () => { activeFilters=[]; renderFilters(); };
+  row.appendChild(allBtn);
+  allCats().forEach(c => {
+    const p = document.createElement('button');
+    p.className = 'pill' + (activeFilters.includes(c)?' on':'');
+    p.textContent = c;
+    p.onclick = () => {
+      if(activeFilters.includes(c)) activeFilters = activeFilters.filter(x=>x!==c);
+      else activeFilters.push(c);
+      renderFilters();
+    };
+    row.appendChild(p);
+  });
+}
+
+function filteredQs() {
+  return activeFilters.length===0 ? questions : questions.filter(q=>activeFilters.includes(q.c));
+}
+
+function nextQ() {
+  const pool = filteredQs();
+  if(pool.length===0) {
+    document.getElementById('q-card').innerHTML='<p class="empty-msg">해당 카테고리에 질문이 없어요.<br>질문 관리 탭에서 추가해보세요.</p>';
+    document.getElementById('progress').textContent='';
+    return;
+  }
+  if(shown.length >= pool.length) shown = [];
+  const remaining = pool.filter(q=>!shown.includes(q.id));
+  const pick = remaining[Math.floor(Math.random()*remaining.length)];
+  shown.push(pick.id);
+  currentQ = pick;
+  document.getElementById('q-card').innerHTML=`
+    <p class="q-num">${shown.length} &nbsp;/&nbsp; ${pool.length}</p>
+    <p class="q-text">${pick.t}</p>
+    <span class="q-cat">${pick.c}</span>
+  `;
+  const isDone = shown.length === pool.length;
+  document.getElementById('progress').textContent = isDone ? '전체 질문을 다 봤어요! 다시 뽑으면 처음부터 시작해요.' : '';
+}
+
+function shuffleAll() {
+  shown = [];
+  nextQ();
+}
+
+function renderList() {
+  const list = document.getElementById('q-list');
+  document.getElementById('q-count').textContent = questions.length + '개';
+  if(questions.length===0) {
+    list.innerHTML='<p style="padding:20px 0;font-size:13px;color:var(--muted)">아직 질문이 없어요.</p>';
+    return;
+  }
+  list.innerHTML = questions.map(q=>`
+    <div class="q-item">
+      <span class="q-cat-tag">${q.c}</span>
+      <span class="q-item-text">${q.t}</span>
+      <button class="del-btn" onclick="delQ(${q.id})" title="삭제">×</button>
+    </div>
+  `).join('');
+}
+
+function addQ() {
+  const input = document.getElementById('new-q');
+  const cat = document.getElementById('cat-sel').value;
+  const text = input.value.trim();
+  if(!text) return;
+  questions.push({t:text, c:cat, id:nextId++});
+  input.value = '';
+  save();
+  renderList();
+  renderFilters();
+}
+
+function delQ(id) {
+  if(!confirm('이 질문을 삭제할까요?')) return;
+  questions = questions.filter(q=>q.id!==id);
+  shown = shown.filter(s=>s!==id);
+  save();
+  renderList();
+  renderFilters();
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', (i===0&&name==='practice')||(i===1&&name==='manage'));
+  });
+  document.getElementById('sec-practice').classList.toggle('show', name==='practice');
+  document.getElementById('sec-manage').classList.toggle('show', name==='manage');
+  if(name==='manage') renderList();
+}
+
+renderFilters();
+</script>
+</body>
+</html>
